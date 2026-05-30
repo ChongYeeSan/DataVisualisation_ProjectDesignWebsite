@@ -23,6 +23,8 @@ Lim Yi Yang (106630225)
 [National Road Safety Data Hub](https://datahub.roadsafety.gov.au/safe-systems/safe-road-use/police-enforcement)
 
 # 6. Dependencies
+- D3.js v7 (https://d3js.org/d3.v7.min.js)
+- Google Fonts - JetBrains Mono (https://fonts.google.com/selection)
 
 # 7. Acknowledgement
 

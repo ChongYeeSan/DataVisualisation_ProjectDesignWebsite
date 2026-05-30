@@ -3,9 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Road Safety Enforcement Dashboard</title>
+
+
+    <!-- Inserting Google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+
+
+<!-- D3.js -->
+ <script src="https://d3js.org/d3.v7.min.js"></script>
+
+ <!-- CSS  -->
+  <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
     
+
+    <!-- NAVIGATION SIDE BAR -->
+     <nav class="sidenav">
+     <div class="sidenav-logo">
+        <div class="logo-pill">
+            <span class="logo-icon"></span>
+            <span class="logo-text">Road Safety<br>Enforcement</span>
+        </div>
+     </div>
+
+     <div class="sidenav-section">
+        <div class="sidenav-label">Datasets</div>
+        <button class="nav-item active" onclick="showPage('drug', this)">
+            <span class="nav-dot"></span> Drug Tests
+        </button>
+        <button class="nav-item" onclick="showPage('fines', this)">
+            <span class="nav-dot"></span> Fines 2024
+        </button>
+     </div>
+
+     <div class="sidenav-footer">
+        <div class="data-source">
+            <span>Source</span><br>
+            Bureau of Infrastructure and Transport Research Economics (BITRE)<br><br>
+            <span>Coverage</span><br>
+            2008-2024 | All states &amp; territories
+        </div>
+     </div>
+    </nav>
+
+    <!-- DRUG TEST PAGE CODE -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- FINES CONTENT PAGE -->
+     <div class="page" id="page-fines">
+
+     <div class="header">
+        <div class="header-left">
+            <h1>Fines</h1>
+            <p>Dashboard showing the offences,detection method, age and location</p>
+        </div>
+        <div class="header-right">
+            <select id="fines-state-filter" onchange="applyFinesStateFilter(this.value)">
+                <option value="ALL">All States</option>
+                <option value="NSW">NSW</option>
+                <option value="VIC">VIC</option>
+                <option value="QLD">QLD</option>
+                <option value="SA">SA</option>
+                <option value="WA">WA</option>
+                <option value="TAS">TAS</option>
+                <option value="ACT">ACT</option>
+            </select>
+            <select id="fines-age-filter" onchange="applyFinesAgeFilter(this.value)">
+                <option value="ALL">All Ages</option>
+                <option value="ALL">12-16</option>
+                <option value="ALL">17-25</option>
+                <option value="ALL">26-39</option>
+                <option value="ALL">40-64</option>
+                <option value="ALL">65 and above</option>
+            </select>
+            <button class="reset-bin" onclick="resetFinesFilter()">Reset</button>
+        </div>
+     </div>
+
+     <!-- Filter indicator bar -->
+      <div class="filter-bar" id="fine-filter-bar">
+        <span>Filtered by:</span>
+        <div class="filter-tag" id="fines-filter-tag">
+            - <button onclick="resetFinesFilter">X</button>
+        </div>
+      </div>
+
+     <div class="content">
+
+
+    <!-- KPI Cards -->
+        <div class="kpi-row">
+            <div class="kpi">
+                <div class="kpi-glow" style="background:var(--blue)"></div>
+                <div class="kpi-top">
+                    <div class="kpi-icon" style="background-color:var(--blue-dim);"></div>
+                    <span class="kpi-badge" style="background-color:var(--blue-dim); color:var(--blue);">2024</span>
+                </div>
+                <div class="kpi-value" id="f-kpi-fines" style="color: blue;">-</div>
+                <div class="kpi-label">Total Fines</div>
+                </div>
+                <div class="kpi">
+                    <div class="kpi-glow" style="background-color:var(--amber);"></div>
+                    <div class="kpi-icon" style="background:var(--amber-dim);"></div>
+                    <span class="kpi-badge" style="background:var(--amber-dim); color: var(--amber);">Top</span>
+                </div>
+                <div class="kpi-value" id="f-kpi-speed" style="color:var(--amber)">-</div>
+                <div class="kpi-label">Speeding Fines</div>
+            </div>
+            <div class="kpi">
+                <div class="kpi-glow" style="background-color:var(--green);"></div>
+                <div class="kpi-top">
+                    <div class="kpi-icon" style="background-color:var(--green-dim);"></div>
+                    <span class="kpi-badge" style="background: var(--green-dim); color: var(--green);">2024</span>
+                </div>
+                <div class="kpi-value" id="f-kpi-arrests" style="color:var(--green)">
+                    <div class="kpi-label">Arrests</div>
+                    </div>
+                    <div class="kpi">
+                        <div class="kpi-glow" style="background:var(--red) ;"></div>
+                        <div class="kpi">
+                        <div class="kpi-icon" style="background: var(--red-dim);"></div>
+                        <span class="kpi-badge" style="background: var(--red-dim);color: var(--red);">-</span>
+                    </div>
+                    <div class="kpi-value" id="f-kpi-charges" style="color:var(--red)">-</div>
+                    <div class="kpi-label">Charges</div>
+                </div>
+            </div>
+            <!-- Charts Grid -->
+            <div class="bento">
+
+                <!-- Fines by Offence -->
+                <div class="card bento-wide">
+                    <div class="card-head">
+                        <div>
+                            <div class="card-title">Fines by offence type</div>
+                            <div class="card-sub">Polic issued vs camera detected | click to explore</div>
+                        </div>
+                        <div class="legend" id="fines-offence-legend"></div>
+                    </div>
+                    <div class="fines-offence-chart"></div>
+                </div>
+
+                <!-- Fines by state and detection method -->
+                <div class="card bento-side">
+                    <div class="card-title">Fines by State</div>
+                    <div class="card-sub" style="margin-bottom: 14px;">Total fines | click to filter</div>
+                    <div id="fines-state-bars"></div>
+                    <div class="divider"></div>
+                    <div class="card-title" style="margin-bottom: 4px;">Detection Method</div>
+                    <div class="card-sub" style="margin-bottom: 14px;">All fines | 2024</div>
+                    <div id="fines-detect-bars"></div>
+                </div>
+
+                <!-- Fines by age and monthly trend -->
+                <div class="card bento-bottom">
+                    <div class="card-head"></div>
+                    <div>
+                        <div class="card-title">Fines by age group &amp; monthly trend</div>
+                        <div class="card-sub">Polive-issued fines | click age bars to filter</div>
+                    </div>
+                </div>
+                <div style="display: grid;grid-template-columns: 1fr 1fr;gap:20px">
+                    <div id="fines-age-chart"></div>
+                    <div id="fines-monthly-chart"></div>
+                </div>
+            </div>
+
+            <!-- Cross dataset comparison between Fines and Arrests by offence -->
+            <div class="card bento-full">
+                <div class="card-head">
+                    <div>
+                        <div class="card-title">Fines vs Arrests by offence - cross-dataset comparison</div>
+                        <div class="card-sub">Combining fines and drug test dataset shows severity of drug driving</div>
+                    </div>
+                    <div class="legend" id="cross-legend"></div>
+                </div>
+                <div id="cross-chart"></div>
+                <div class="insight-box">
+                    <strong>Key Insight:</strong>Drug driving generaties far fewer fines than speeding or mobile phone usage, 
+                    however the arrest rate is disproportionately high, showing it is a serious criminal matter rathen a simple
+                    infringement.
+                </div>
+            </div>
+        </div>
+    </div> 
+
+        <div class="note">
+            ^ Camera-detect fines record age/location as "Unknown" - removed from age breakdowns. Drug driving fines
+            sourced from the drug tests dataset. Cross-dataset comparison uses data from 2024 only.
+        </div>
+     </div>
+    </div>
+</div>
+
+<div class="infor-panel" id="infoPanel">
+    <div class="info-top">
+        <span class="info-chip" id="infoChip">Info</span>
+        <button class="info-class" onclick="closeInfo()">X</button>
+    </div>
+    <div class="info-title" id="infoTitle">-</div>
+    <div class="info-value" id="infoValue">-</div>
+    <div class="info-divider"></div>
+    <div class="info-body" id="infoBody">Click any element to see details</div>
+    <div class="info-hint" id="infoHint"></div>
+    <div class="info-filter-note" id="infoFilterNote" style="display: none;">Charts are filteres base on this selection</div>
+</div>
+    
+
+<!-- JS file declaration -->
+
+<script src="js/main.js"></script>
+<script src="js/charts/finesOffence.js"></script>
+<script src="js/charts/FinesAge.js"></script>
+<script src="js/charts/finesMonthly.js"></script>
+<script src="js/charts/crossdataset.js"></script>
+
+
 </body>
 </html>
