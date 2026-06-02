@@ -1,0 +1,779 @@
+/* settings panel that updates the color rather than changing it one by one */
+:root {
+    --bg : #e8d5c0;
+    --surface : #3d2010;
+    --surface2 : #522a14;
+    --surface-light : #f0e0cc;
+    --border : #c4956a;
+    --border-light : #d4a882;
+    --text : #f5e6d0;
+    --text-dark : #2c1a0e;
+    --text-mid : #c4956a;
+    --text-dim : #a07040;
+    --orange : #d4621a;
+    --orange-light : #e8824a;
+    --orange-dim : rgba (212,98,26,0.2);
+    --amber : #c48820;
+    --amber-dim : rgba(196,136,32,0.15);
+    --green : #2d7a4a;
+    --green-dim : rgba(45,112,74,0.15);
+    --red : #b83232;
+    --red-dim : rgba(184,50,50,0.15);
+    --blue : #2a5ea8;
+    --blue-dim : rgba(42,94,168,0.15);
+    --pink-bar : #e8a090;
+}
+
+/* Reset button */
+* {
+    margin: 0;
+    padding:0;
+    box-sizing : border-box;
+}
+
+/* sets the overall page and mkae the sidebar and main area to show side by side */
+body {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+}
+
+/* creates a left navigation bar with position fixed 
+so it stays in place when scrolling */
+.sidenav {
+    width: 200px;
+    min-width: 110px;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    padding: 16px 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 50;
+}
+
+.sidenav-logo {
+    padding: 0 12px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 16px;
+}
+
+/* adds a slight curve to the box of the logo */
+.logo-pill {
+    background: rgba(255,255,255,0.08);
+    border-radius: 6px;
+    padding: 8px 10px;
+    text-align: center;
+}
+
+.logo-text {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1.4;
+}
+
+.sidenav-section {
+    padding: 0 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sidenav-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.25);
+    padding: 0 8px;
+    margin-bottom: 4px;
+}
+
+/* buttons showing on the sidebar and when user click
+it turns orange */
+.nav-item {
+    display : flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    border: none;
+    background: none;
+    width: none;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    transition: all 0.15s;
+}
+
+.nav-item:hover {
+    background: rgba(255,255,255,0.08);
+    color: var(--text);
+}
+
+.nav-item.active {
+    background: var(--orange);
+    color: white;
+    font-weight: 700;
+}
+
+.sidenav-footer {
+    margin-top: auto;
+    padding: 16px 12px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.data-source {
+    font-size: 9px;
+    color: rgba(255,255,255,0.25);
+    line-height: 1.7;
+}
+
+.data-source span {
+    color: rgba(255,255,255,0.5);
+    font-weight: 700;
+}
+
+/* holds the header and main content */
+.main {
+    margin-left: 110px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* shows the page title and filter dropdowns */
+.header {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border-light);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+}
+
+/* contains the title and description */
+.header-left h1 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-dark);
+}
+
+/* contains the page description */
+.header-left p {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+/* contains the filter dropdowns */
+.header-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* filter dropdown styles */
+select {
+  background: var(--surface-light);
+  border: 1px solid var(--border-light);
+  color: var(--text-dark);
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s;
+}
+ 
+select:focus {
+  border-color: var(--orange);
+}
+
+/*  */
+.reset-btn {
+  background: var(--surface);
+  border: none;
+  color: var(--text);
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+ 
+.reset-btn:hover {
+  background: var(--orange);
+}
+
+/* allows users to filter the content based on their preferences */
+.filter-bar {
+  background: var(--surface-light);
+  border-bottom: 1px solid var(--border-light);
+  padding: 8px 28px;
+  display: none;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+ 
+.filter-bar.visible {
+  display: flex;
+}
+
+/* filter tags turn orange when active */
+.filter-tag {
+  background: var(--orange-dim);
+  border: 1px solid rgba(212, 98, 26, 0.3);
+  color: var(--orange);
+  padding: 3px 10px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+ 
+.filter-tag button {
+  background: none;
+  border: none;
+  color: var(--orange);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0;
+  font-family: monospace;
+}
+
+/* controls which page is showing and shows only the active page when 
+user clicks the sidebar */
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+/* main page showing the contents */
+.content {
+    padding: 20px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* shows the stat cards on top of the page */
+
+.kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.kpi {
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+}
+
+.kpi-glow {
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  opacity: 0.2;
+  filter: blur(25px);
+}
+ 
+.kpi-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+ 
+.kpi-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.1);
+}
+ 
+.kpi-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+}
+ 
+.kpi-value {
+  font-size: 26px;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--text);
+}
+ 
+.kpi-label {
+  font-size: 10px;
+  color: var(--text-mid);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+}
+
+/* controls the layout of the bento grid */
+
+.bento {
+    display: gird;
+    grid-template-columns: repeat(1.6fr 1fr);
+    gap: 12px;
+}
+
+.bento-wide { grid-column: 1 / 2; }
+.bento-side { grid-column: 2 / 3; grid-row: 1 / 3; }
+.bento-bottom { grid-column: 1 / 2; }
+.bento-full { grid-column: 1 / -1; }
+ 
+/* adds curve corners to the beige boxes that holds each chart */
+.card {
+  background: var(--surface-light);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+ 
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+ 
+.card-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-dark);
+  letter-spacing: -0.01em;
+}
+ 
+.card-sub {
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+/* Legend */
+
+.legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+ 
+.leg {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+ 
+.leg-c {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+ 
+.leg-sq {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.state-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+ 
+.state-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+  border: 1px solid transparent;
+}
+
+/* clickable state rows and highlights the selected state in orange */
+.state-row:hover {
+  background: var(--bg);
+}
+ 
+.state-row.selected {
+  background: var(--orange-dim);
+  border-color: rgba(212, 98, 26, 0.25);
+}
+ 
+.state-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+  width: 32px;
+  font-family: 'JetBrains Mono', monospace;
+  flex-shrink: 0;
+}
+ 
+.state-bar-track {
+  flex: 1;
+  background: var(--bg);
+  border-radius: 4px;
+  height: 7px;
+  overflow: hidden;
+}
+ 
+.state-bar {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--orange);
+  transition: width 0.4s ease;
+}
+ 
+.state-val {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-dim);
+  width: 40px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/*  */
+
+.prog-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+ 
+.prog-item {
+  padding: 5px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+ 
+.prog-item:hover {
+  background: var(--bg);
+}
+ 
+.prog-item.selected {
+  background: var(--orange-dim);
+}
+ 
+.prog-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+ 
+.prog-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+ 
+.prog-val {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-dim);
+}
+ 
+.prog-track {
+  background: var(--bg);
+  border-radius: 4px;
+  height: 5px;
+  overflow: hidden;
+}
+ 
+.prog-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+/*  */
+
+.divider {
+    height: 1px;
+    background: var(--border-light);
+    margin: 14px 0;
+}
+
+/*  */
+
+.note {
+    font-size: 10px;
+    color: var(--text-dim);
+    line-height: 1.7;
+    padding: 10px 14px;
+    background: var(--surface-light);
+    border-radius: 8px;
+    border-left: 2px solid var(--border--light);
+}
+
+/* Insight box ->  might remove it but will keep it for now */
+
+.insight-box {
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: rgba(196, 136, 32, 0.08);
+  border-radius: 8px;
+  border-left: 2px solid var(--amber);
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+ 
+.insight-box strong {
+  color: var(--amber);
+}
+
+/* pop-up panel that shows when users click on a chart element */
+
+.info-panel {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 265px;
+  background: var(--surface);
+  border: 1px solid rgba(212, 98, 26, 0.4);
+  border-radius: 14px;
+  padding: 18px 20px;
+  z-index: 300;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  transform: translateY(16px) scale(0.97);
+  transition: opacity 0.22s, transform 0.22s;
+  pointer-events: none;
+}
+
+/* to add like a fade-in effect   */
+.info-panel.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: all;
+}
+ 
+.info-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+ 
+.info-chip {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--orange);
+  background: var(--orange-dim);
+  border: 1px solid rgba(212, 98, 26, 0.2);
+  padding: 3px 8px;
+  border-radius: 5px;
+}
+ 
+.info-close {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-mid);
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: monospace;
+  transition: all 0.15s;
+}
+ 
+.info-close:hover {
+  color: var(--text);
+  border-color: var(--orange);
+}
+ 
+.info-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+ 
+.info-value {
+  font-size: 20px;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: -0.04em;
+  color: var(--orange);
+  margin: 8px 0;
+  line-height: 1;
+}
+ 
+.info-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 10px 0;
+}
+ 
+.info-body {
+  font-size: 11px;
+  color: var(--text-mid);
+  line-height: 1.75;
+  font-weight: 400;
+}
+ 
+.info-hint {
+  margin-top: 8px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.25);
+  font-style: italic;
+}
+ 
+.info-filter-note {
+  margin-top: 10px;
+  padding: 7px 10px;
+  background: var(--orange-dim);
+  border-radius: 6px;
+  font-size: 11px;
+  color: var(--orange);
+  font-weight: 600;
+}
+
+/* D3 Chart elements */
+
+.chart-svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+ 
+.axis path,
+.axis line {
+  stroke: var(--border-light);
+}
+ 
+.axis text {
+  fill: var(--text-dim);
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+}
+ 
+.grid line {
+  stroke: var(--border-light);
+  stroke-opacity: 0.4;
+}
+ 
+.grid path {
+  stroke-width: 0;
+}
+ 
+.bar-rect {
+  cursor: pointer;
+  transition: opacity 0.15s, filter 0.15s;
+}
+ 
+.bar-rect:hover {
+  opacity: 0.75;
+  filter: brightness(1.1);
+}
+ 
+.bar-rect.dimmed {
+  opacity: 0.15;
+}
+ 
+.bar-rect.highlighted {
+  stroke: var(--surface);
+  stroke-width: 1.5;
+}
+ 
+.line-path {
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+ 
+.area-path {
+  opacity: 0.15;
+}
+ 
+.dot-circle {
+  cursor: pointer;
+  transition: r 0.15s;
+}
+ 
+.dot-circle:hover {
+  r: 6;
+}
+
+/*  */
+
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-light);
+    border-radius: 5px;
+}

@@ -16,6 +16,15 @@ Lim Yi Yang (106630225)
 
 # 3. How to Run
 
+![Image 1](images/preview.png)
+
+**Click on the preview button which has a small manifying glass**
+
+
+![Image 2](images/preview2.png)
+
+**Click on the 3 dots on the right side and click on "Open in External Browser" to view from the browser.**
+
 # 4. File Structure
 
 # 5. Data Sources
