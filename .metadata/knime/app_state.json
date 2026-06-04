@@ -1,0 +1,22 @@
+{
+  "version" : "5.4.3.v202503031608",
+  "projects" : [ {
+    "name" : "YiYang_YeeSanDB",
+    "active" : true,
+    "origin" : {
+      "providerId" : "local",
+      "spaceId" : "local",
+      "relativePath" : "YiYang_YeeSanDB"
+    }
+  } ],
+  "mostRecentlyUsedProjects" : [ {
+    "name" : "YiYang_YeeSanDB",
+    "timeUsed" : "2026-05-25T12:12:42.7266257+08:00",
+    "origin" : {
+      "providerId" : "local",
+      "spaceId" : "local",
+      "projectType" : "WORKFLOW",
+      "relativePath" : "YiYang_YeeSanDB"
+    }
+  } ]
+}

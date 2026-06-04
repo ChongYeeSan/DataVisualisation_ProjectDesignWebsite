@@ -12,7 +12,7 @@
     --text-dim : #a07040;
     --orange : #d4621a;
     --orange-light : #e8824a;
-    --orange-dim : rgba (212,98,26,0.2);
+    --orange-dim : rgba(212,98,26,0.2);
     --amber : #c48820;
     --amber-dim : rgba(196,136,32,0.15);
     --green : #2d7a4a;
@@ -146,11 +146,12 @@ it turns orange */
 
 /* holds the header and main content */
 .main {
-    margin-left: 110px;
+    margin-left: 200px;
     flex: 1;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    min-width: 0;
 }
 
 /* shows the page title and filter dropdowns */
@@ -361,14 +362,16 @@ user clicks the sidebar */
 /* controls the layout of the bento grid */
 
 .bento {
-    display: gird;
-    grid-template-columns: repeat(1.6fr 1fr);
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    grid-template-rows: auto auto;
     gap: 12px;
 }
 
 .bento-wide { grid-column: 1 / 2; }
 .bento-side { grid-column: 2 / 3; grid-row: 1 / 3; }
 .bento-bottom { grid-column: 1 / 2; }
+.bento-bottom-full { grid-column: 1 / -1; }
 .bento-full { grid-column: 1 / -1; }
  
 /* adds curve corners to the beige boxes that holds each chart */
