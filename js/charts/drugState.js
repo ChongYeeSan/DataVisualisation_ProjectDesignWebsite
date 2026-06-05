@@ -14,9 +14,9 @@
 
     // Short human-readable labels for detection stages
     const DETECT_LABELS = {
-        'Stage 1 – Indicator':       { short: 'Stage 1', color: 'var(--orange)' },
-        'Stage 2 – Confirmatory':    { short: 'Stage 2', color: 'var(--amber)'  },
-        'Stage 3 – Lab / Toxicology':{ short: 'Stage 3', color: 'var(--blue)'   },
+        'Stage 1 – Indicator':       { short: 'Indicator', color: 'var(--orange)' },
+        'Stage 2 – Confirmatory':    { short: 'Secondary Confirmatory', color: 'var(--amber)'  },
+        'Stage 3 – Lab / Toxicology':{ short: 'Lab / Toxicology', color: 'var(--blue)'   },
     };
 
     // ── RENDER STATE BARS ────────────────────────────────────────
