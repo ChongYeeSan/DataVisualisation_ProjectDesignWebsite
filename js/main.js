@@ -1,3 +1,12 @@
+/* Switches the Pages */
+function showPage(name, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  el.classList.add('active');
+  closeInfo();
+}
+
 function showInfoPanel(chip, title, value, body, showFilter) {
     document.getElementById('infoChip').textContent  = chip;
     document.getElementById('infoTitle').textContent = title;
