@@ -9,8 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
 
-    <!-- D3.js -->
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    
 
  <!-- CSS  -->
   <link rel="stylesheet" href="css/styles.css"/>
@@ -213,7 +213,7 @@
                         <option value="17-25">17-25</option>
                         <option value="26-39">26-39</option>
                         <option value="40-64">40-64</option>
-                        <option value="65+">65 and above</option>
+                        <option value="65 and over">65 and above</option>
                     </select>
                     <button class="reset-btn" onclick="resetFinesFilter()">Reset</button>
                 </div>
@@ -234,7 +234,7 @@
                         <div class="kpi-glow" style="background:var(--blue)"></div>
                         <div class="kpi-top">
                             <div class="" style="background:var(--blue-dim)"></div>
-                            <span class="kpi-badge" style="background:var(--blue-dim);color:var(--blue)">2024</span>
+                            <span class="kpi-badge" style="background:var(--blue-dim);color:var(--blue)">Total</span>
                         </div>
                         <div class="kpi-value" id="f-kpi-fines" style="color:var(--blue)">—</div>
                         <div class="kpi-label">Total Fines</div>
@@ -243,7 +243,7 @@
                         <div class="kpi-glow" style="background:var(--amber)"></div>
                         <div class="kpi-top">
                             <div class="" style="background:var(--amber-dim)"></div>
-                            <span class="kpi-badge" style="background:var(--amber-dim);color:var(--amber)">Top</span>
+                            <span class="kpi-badge" style="background:var(--amber-dim);color:var(--amber)">Fines</span>
                         </div>
                         <div class="kpi-value" id="f-kpi-speed" style="color:var(--amber)">—</div>
                         <div class="kpi-label">Speeding Fines</div>
@@ -252,7 +252,7 @@
                         <div class="kpi-glow" style="background:var(--green)"></div>
                         <div class="kpi-top">
                             <div class="" style="background:var(--green-dim)"></div>
-                            <span class="kpi-badge" style="background:var(--green-dim);color:var(--green)">2024</span>
+                            <span class="kpi-badge" style="background:var(--green-dim);color:var(--green)">Total</span>
                         </div>
                         <div class="kpi-value" id="f-kpi-arrests" style="color:var(--green)">—</div>
                         <div class="kpi-label">Arrests</div>
@@ -261,7 +261,7 @@
                         <div class="kpi-glow" style="background:var(--red)"></div>
                         <div class="kpi-top">
                             <div class="" style="background:var(--red-dim)"></div>
-                            <span class="kpi-badge" style="background:var(--red-dim);color:var(--red)">2024</span>
+                            <span class="kpi-badge" style="background:var(--red-dim);color:var(--red)">Serious</span>
                         </div>
                         <div class="kpi-value" id="f-kpi-charges" style="color:var(--red)">—</div>
                         <div class="kpi-label">Charges</div>
@@ -279,7 +279,7 @@
                             </div>
                             <div class="legend" id="fines-offence-legend"></div>
                         </div>
-                        <div class="fines-offence-chart"></div>
+                        <div id ="fines-offence-chart"></div>
                     </div>
 
                     <div class="card bento-side">
@@ -350,16 +350,22 @@
     </div>
 
     <!-- JS -->
-    <script src="js/main.js"></script>
+    
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
     <script src="js/drugMain.js"></script>
+    <script src="js/finesMain.js"></script>
     <script src="js/charts/drugTrend.js"></script>
     <script src="js/charts/drugState.js"></script>
     <script src="js/charts/drugAge.js"></script>
     <script src="js/charts/drugType.js"></script>
     <script src="js/charts/finesOffence.js"></script>
-    <script src="js/charts/FinesAge.js"></script>
+    <script src="js/charts/finesAge.js"></script>
+    <script src="js/charts/finesDetect.js"></script>
+    <script src="js/charts/finesState.js"></script>
     <script src="js/charts/finesMonthly.js"></script>
     <script src="js/charts/crossdataset.js"></script>
 
 </body>
 </html>
+
