@@ -115,8 +115,7 @@
                         'Age Group',
                         d.age,
                         d.count.toLocaleString() + ' positive tests',
-                        'Positive tests attributed to this age bracket',
-                        false
+                        
                     );
                 }
             })

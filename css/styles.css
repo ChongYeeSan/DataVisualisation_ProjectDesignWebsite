@@ -589,8 +589,15 @@ user clicks the sidebar */
 
 .info-panel {
   position: fixed;
-  right: 24px;
-  bottom: 24px;
+  /* Default left/top here are placeholders — JS (positionInfoPanel)
+     overrides these on hover to follow the cursor.
+     right/bottom are explicitly cleared so left/top always win
+     (with width set and height:auto, leaving right/bottom active
+     would over-constrain and stretch the panel). */
+  left: 24px;
+  top: 24px;
+  right: auto;
+  bottom: auto;
   width: 265px;
   background: var(--surface);
   border: 1px solid rgba(212, 98, 26, 0.4);

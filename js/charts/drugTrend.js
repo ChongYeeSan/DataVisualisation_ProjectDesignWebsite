@@ -26,6 +26,11 @@
         // Clear any previous render
         container.innerHTML = '';
 
+        // Hide the info panel once the cursor leaves the whole chart area
+        // (rather than per-element, so moving between the dots and the
+        // invisible hit-bars doesn't cause flicker).
+        container.addEventListener('mouseleave', hideInfo);
+
         const totalW = container.clientWidth || 560;
         width = totalW - MARGIN.left - MARGIN.right;
         const innerH = HEIGHT - MARGIN.top - MARGIN.bottom;
@@ -156,7 +161,10 @@
                 DrugPage.applyYearFilter(cur === String(d.year) ? 'ALL' : String(d.year));
             })
             .on('mouseover', function (event, d) {
-                showInfo(d);
+                showInfo(d, event);
+            })
+            .on('mousemove', function (event, d) {
+                positionInfoPanel(event);
             });
 
         dots.exit().remove();
@@ -181,13 +189,22 @@
                 const cur = DrugPage.filtered().year;
                 DrugPage.applyYearFilter(cur === String(d.year) ? 'ALL' : String(d.year));
             })
-            .on('mouseover', (event, d) => showInfo(d));
+            .on('mouseover', (event, d) => showInfo(d, event))
+            .on('mousemove', (event, d) => positionInfoPanel(event));
 
         hitBars.exit().remove();
     }
 
     // ── INFO PANEL HELPER ────────────────────────────────────────
-    function showInfo(d) {
+
+    /** Hides the info panel (called on mouseleave from the chart area). */
+    function hideInfo() {
+        const panel = document.getElementById('infoPanel');
+        if (panel) panel.classList.remove('visible');
+    }
+
+    function showInfo(d, event) {
+        if (event) positionInfoPanel(event);
         if (typeof showInfoPanel === 'function') {
             showInfoPanel(
                 'Trend',
@@ -197,6 +214,45 @@
                 true
             );
         }
+    }
+
+    /**
+     * Moves #infoPanel so it sits just below-and-right of the cursor,
+     * flipping to the opposite side(s) if it would overflow the viewport.
+     * Overrides the CSS left/top fixed-position defaults; right/bottom
+     * stay cleared (set in styles.css) so the panel doesn't stretch.
+     */
+    function positionInfoPanel(event) {
+        const panel = document.getElementById('infoPanel');
+        if (!panel || !event) return;
+
+        const OFFSET = 16;          // gap between cursor and panel corner
+        const EDGE   = 8;           // min gap from viewport edge
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        const rect = panel.getBoundingClientRect();
+        const pw = rect.width  || 265;
+        const ph = rect.height || 160;
+
+        let left = event.clientX + OFFSET;
+        let top  = event.clientY + OFFSET;
+
+        // Flip to the left of the cursor if it would overflow the right edge
+        if (left + pw > vw - EDGE) {
+            left = event.clientX - pw - OFFSET;
+        }
+        // Flip above the cursor if it would overflow the bottom edge
+        if (top + ph > vh - EDGE) {
+            top = event.clientY - ph - OFFSET;
+        }
+
+        // Final clamp so it never goes off-screen on the top/left either
+        left = Math.max(EDGE, Math.min(left, vw - pw - EDGE));
+        top  = Math.max(EDGE, Math.min(top,  vh - ph - EDGE));
+
+        panel.style.left = `${left}px`;
+        panel.style.top  = `${top}px`;
     }
 
     // ── REGISTER WITH DrugPage ───────────────────────────────────
