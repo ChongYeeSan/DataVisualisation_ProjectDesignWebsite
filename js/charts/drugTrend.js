@@ -126,24 +126,24 @@
         const { trendData, year: activeYear } = data;
         const innerH = HEIGHT - MARGIN.top - MARGIN.bottom;
 
-        // Area
-        svg.select('.drug-area-path')
-            .datum(trendData)
-            .attr('d', area)
-            .style('fill', 'var(--orange)')
-            .style('opacity', 0.18);
+            // Area
+            svg.select('.drug-area-path')
+                .datum(trendData)
+                .attr('d', area)
+                .style('fill', 'var(--orange)')
+                .style('opacity', 0.18);
 
-        // Line
-        svg.select('.drug-line-path')
-            .datum(trendData)
-            .attr('d', line)
-            .style('stroke', 'var(--orange)')
-            .style('stroke-width', 2.5);
+            // Line
+            svg.select('.drug-line-path')
+                .datum(trendData)
+                .attr('d', line)
+                .style('stroke', 'var(--orange)')
+                .style('stroke-width', 2.5);
 
-        // Dots
-        const dots = svg.select('.drug-dots')
-            .selectAll('.drug-dot')
-            .data(trendData, d => d.year);
+            // Dots
+            const dots = svg.select('.drug-dots')
+                .selectAll('.drug-dot')
+                .data(trendData, d => d.year);
 
         dots.enter()
             .append('circle')
@@ -210,8 +210,8 @@
                 'Trend',
                 String(d.year),
                 d.count.toLocaleString() + ' positive tests',
-                `Click to ${DrugPage.filtered().year === String(d.year) ? 'clear' : 'filter to'} ${d.year}`,
-                true
+                
+                
             );
         }
     }
