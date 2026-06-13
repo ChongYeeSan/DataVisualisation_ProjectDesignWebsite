@@ -34,7 +34,11 @@
             <button class="nav-item" onclick="showPage('fines', this)">
                 <span class="nav-dot"></span> Fines 2024
             </button>
+            <button class="nav-item" onclick="showPage('death', this)">
+                <span class="nav-dot"></span> Road Deaths
+            </button>
         </div>
+
 
         <div class="sidenav-footer">
             <div class="data-source">
@@ -332,7 +336,134 @@
                 </div>
 
             </div>
-        </div>
+        </div>  <!-- closing of fines page -->
+
+        <!-- ROAD DEATHS PAGE -->
+        <div class="page" id="page-death">
+
+            <div class="header">
+                <div class="header-left">
+                    <h1>Road Deaths</h1>
+                    <p>Australian road fatalities by state, age, road user and conditions</p>
+                </div>
+                <div class="header-right">
+                    <select id="death-state-sel" onchange="applyDeathStateFilter(this.value)">
+                        <option value="ALL">All States</option>
+                        <option value="NSW">NSW</option>
+                        <option value="VIC">VIC</option>
+                        <option value="QLD">QLD</option>
+                        <option value="SA">SA</option>
+                        <option value="WA">WA</option>
+                        <option value="TAS">TAS</option>
+                        <option value="ACT">ACT</option>
+                        <option value="NT">NT</option>
+                    </select>
+                    <select id="death-user-sel" onchange="applyDeathsUserFilter(this.value)">
+                        <option value="ALL">All Road Users</option>
+                        <option value="Driver">Driver</option>
+                        <option value="Motorcycle rider">Motorcycle rider</option>
+                        <option value="Passenger">Passenger</option>
+                        <option value="Pedestrian">Pedestrian</option>
+                        <option value="Pedal cyclist">Pedal cyclist</option>
+                    </select>
+                    <button class="reset-btn" onclick="resetDeathFilter()">Reset</button>
+                </div>
+            </div>
+
+            <div class="filter-bar" id="death-filter-bar">
+                <span>Filtered by:</span>
+                <div class="filter-tag" id="death-filter-tag">
+                    — <button onclick="resetDeathFilter()">✕</button>
+                </div>
+            </div>
+
+            <div class="content">
+
+                <!-- KPI Cards -->
+                <div class="kpi-row">
+                    <div class="kpi">
+                        <div class="kpi-glow" style="background:var(--red)"></div>
+                        <div class="kpi-top">
+                            <div class="" style="background:var(--red-dim)"></div>
+                            <span class="kpi-badge" style="background:var(--red-dim);color:var(--red)">2024</span>
+                        </div>
+                        <div class="kpi-value" id="dt-total" style="color:var(--red)">—</div>
+                        <div class="kpi-label">Total Deaths</div>
+                    </div>
+                    <div class="kpi">
+                        <div class="kpi-glow" style="background:var(--orange)"></div>
+                        <div class="kpi-top">
+                            <div class="" style="background:var(--orange-dim)"></div>
+                            <span class="kpi-badge" style="background:var(--orange-dim);color:var(--orange)">Top</span>
+                        </div>
+                        <div class="kpi-value" id="dt-drivers" style="color:var(--orange)">—</div>
+                        <div class="kpi-label">Drivers</div>
+                    </div>
+                    <div class="kpi">
+                        <div class="kpi-glow" style="background:var(--amber)"></div>
+                        <div class="kpi-top">
+                            <div class="" style="background:var(--amber-dim)"></div>
+                            <span class="kpi-badge" style="background:var(--amber-dim);color:var(--amber)">Riders</span>
+                        </div>
+                        <div class="kpi-value" id="dt-moto" style="color:var(--amber)">—</div>
+                        <div class="kpi-label">Motorcyclists</div>
+                    </div>
+                    <div class="kpi">
+                        <div class="kpi-glow" style="background:var(--blue)"></div>
+                        <div class="kpi-top">
+                            <div class="" style="background:var(--blue-dim)"></div>
+                            <span class="kpi-badge" style="background:var(--blue-dim);color:var(--blue)">Walking</span>
+                        </div>
+                        <div class="kpi-value" id="dt-ped" style="color:var(--blue)">—</div>
+                        <div class="kpi-label">Pedestrians</div>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="bento">
+
+                    <div class="card bento-wide">
+                        <div class="card-head">
+                            <div>
+                                <div class="card-title">Road deaths over time</div>
+                                <div class="card-sub">2014 – 2025 | annual fatalities</div>
+                            </div>
+                        </div>
+                        <div id="death-trend-chart"></div>
+                    </div>
+
+                    <div class="card bento-side">
+                        <div class="card-title">Deaths by State</div>
+                        <div class="card-sub" style="margin-bottom:14px">2024 | click to filter</div>
+                        <div id="death-state-bars"></div>
+                        <div class="divider"></div>
+                        <div class="card-title" style="margin-bottom:4px">Road User Type</div>
+                        <div class="card-sub" style="margin-bottom:14px">Share of deaths | 2024</div>
+                        <div id="death-user-bars"></div>
+                    </div>
+
+                    <div class="card bento-bottom">
+                        <div class="card-head">
+                            <div>
+                                <div class="card-title">Deaths by age group &amp; speed zone</div>
+                                <div class="card-sub">2024 | hover bars for detail</div>
+                            </div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+                            <div id="death-age-chart"></div>
+                            <div id="death-speed-chart"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="note">
+                    ^ Data from BITRE Australian Road Deaths Database. Trend shows complete years 2014–2025
+                    (2026 excluded as partial). All other charts show 2024. Unknown ages excluded.
+                </div>
+
+            </div>
+        </div><!-- /#page-deaths -->
 
     </div>
 
@@ -356,6 +487,7 @@
     
     <script src="js/drugMain.js"></script>
     <script src="js/finesMain.js"></script>
+    <script src="js/deathMain.js"></script>
     <script src="js/charts/drugTrend.js"></script>
     <script src="js/charts/drugState.js"></script>
     <script src="js/charts/drugAge.js"></script>
@@ -366,6 +498,7 @@
     <script src="js/charts/finesState.js"></script>
     <script src="js/charts/finesMonthly.js"></script>
     <script src="js/charts/finesArrests.js"></script>
+    <script src="js/charts/deathCharts.js"></script>
 
 </body>
 </html>

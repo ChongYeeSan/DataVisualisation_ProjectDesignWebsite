@@ -1,8 +1,4 @@
-/* ═══════════════════════════════════════════
-   main.js
-   Shared logic — data loading, page switching,
-   fines filters, KPIs, info panel
-═══════════════════════════════════════════ */
+
 
 // holds the loaded CSV data once D3 reads them
 let finesData2024 = [];   // fines_2024.csv
@@ -24,11 +20,16 @@ function showPage(name, el) {
   el.classList.add('active');
   closeInfo();
 
-  // render fines charts the first time the fines page is opened
-  // (container now has its proper width since the page is visible)
+  // render fines charts on first open
   if (name === 'fines' && !finesChartsRendered) {
     renderAllFinesCharts();
     finesChartsRendered = true;
+  }
+
+  // render death charts on first open
+  if (name === 'death' && !deathChartsRendered) {
+    renderAllDeathCharts();
+    deathChartsRendered = true;
   }
 }
 
@@ -199,7 +200,6 @@ async function loadData() {
   }
 }
 
-// ── WINDOW RESIZE HANDLER ─────────────────────────────
 // charts measure their container width when drawn, so when the
 // window is resized we redraw them to match the new width.
 // a short debounce stops it firing constantly while dragging.
