@@ -112,8 +112,6 @@
                         'Drug Type',
                         d.drug,
                         d.count.toLocaleString() + ' tests flagged',
-                        'Note: one test may flag multiple substances.',
-                        false
                     );
                 }
             });
