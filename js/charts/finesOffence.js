@@ -106,7 +106,7 @@ function renderFinesOffenceChart(dimOffence) {
   const maxVal = d3.max(offenceData, d => Math.max(d.police, d.camera));
 
   const y = d3.scaleLinear()
-    .domain([0, maxVal * 1.15])
+    .domain([0, maxVal * 1.30])
     .range([height, 0]);
 
   // Grid Lines
@@ -206,8 +206,10 @@ function renderFinesOffenceChart(dimOffence) {
   const legend = document.getElementById('fines-offence-legend');
   if (legend) {
     legend.innerHTML = `
-      <div class="leg"><div class="leg-sq" style="background:var(--pink-bar)"></div>Camera</div>
-      <div class="leg"><div class="leg-sq" style="background:var(--orange)"></div>Police Issued</div>
+      <div class="leg"><div class="leg-sq" style=
+      "background:var(--pink-bar)"></div>Camera</div>
+      <div class="leg"><div class="leg-sq" style=
+      "background:var(--orange)"></div>Police Issued</div>
     `;
   }
 }
