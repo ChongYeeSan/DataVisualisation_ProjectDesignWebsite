@@ -1,8 +1,4 @@
-/* ═══════════════════════════════════════════
-   main.js
-   Shared logic — data loading, page switching,
-   fines filters, KPIs, info panel
-═══════════════════════════════════════════ */
+
 
 // holds the loaded CSV data once D3 reads them
 let finesData2024 = []; // fines_2024.csv
@@ -28,17 +24,29 @@ function showPage(name, el) {
   el.classList.add("active");
   closeInfo();
 
-  if (name === "fines" && !finesChartsRendered) {
-    renderFinesOffenceChart(null);
-    renderFinesStateBars("ALL");
-    renderFinesDetectBars();
-    renderFinesAgeBars("ALL");
-    renderFinesMonthlyChart();
-    if (typeof renderCrossDatasetChart === "function")
-      renderCrossDatasetChart();
+  // render fines charts on first open
+  if (name === 'fines' && !finesChartsRendered) {
+    renderAllFinesCharts();
     finesChartsRendered = true;
   }
+
+  // render death charts on first open
+  if (name === 'death' && !deathChartsRendered) {
+    renderAllDeathCharts();
+    deathChartsRendered = true;
+  }
 }
+
+// helper that draws every fines chart — used on first open and on resize
+function renderAllFinesCharts() {
+  renderFinesOffenceChart(null);
+  renderFinesStateBars(filters.fines.state);
+  renderFinesDetectBars();
+  renderFinesAgeBars(filters.fines.age);
+  renderFinesMonthlyChart();
+  if (typeof renderFinesArrestsChart === 'function') renderFinesArrestsChart();
+}
+
 
 function showInfoPanel(chip, title, value, body, showFilter) {
   document.getElementById("infoChip").textContent = chip;
@@ -145,7 +153,7 @@ function applyFinesStateFilter(state) {
   renderFinesDetectBars();
   renderFinesAgeBars(filters.fines.age);
   renderFinesMonthlyChart();
-  if (typeof renderCrossDatasetChart === "function") renderCrossDatasetChart();
+  if (typeof renderFinesArrestsChart === 'function') renderFinesArrestsChart();
 
   updateFinesFilterBar(buildFinesFilterLabel());
 }
@@ -175,7 +183,7 @@ function resetFinesFilter() {
   renderFinesDetectBars();
   renderFinesAgeBars("ALL");
   renderFinesMonthlyChart();
-  if (typeof renderCrossDatasetChart === "function") renderCrossDatasetChart();
+  if (typeof renderFinesArrestsChart === 'function') renderFinesArrestsChart();
 
   updateFinesFilterBar("");
   closeInfo();
@@ -212,28 +220,37 @@ function updateFinesKPIs() {
 async function loadData() {
   try {
     // load fines_2024.csv
-    finesData2024 = await d3.csv("data/fines_2024.csv");
-    finesData2024 = finesData2024.filter(
-      (d) => d.AGE_GROUP !== "All ages" && d.LOCATION !== "All regions",
+    finesData2024 = await d3.csv('data/fines_2024.csv');
+
+    // remove aggregate summary rows so totals are not double counted
+    finesData2024 = finesData2024.filter(d =>
+      d.AGE_GROUP !== 'All ages' && d.LOCATION !== 'All regions'
     );
 
     // convert numeric columns from strings to numbers
-    const finesNums = ["FINES", "ARRESTS", "CHARGES"];
-    finesData2024.forEach((d) => finesNums.forEach((c) => (d[c] = +d[c] || 0)));
+    const finesNums = ['FINES', 'ARRESTS', 'CHARGES'];
+    finesData2024.forEach(d => finesNums.forEach(c => d[c] = +d[c] || 0));
 
+    // update KPIs on load (charts render when the fines page is opened)
     updateFinesKPIs();
 
-    // ── INITIALISE FINES PAGE ──
-    // updateFinesKPIs();
-    // renderFinesOffenceChart(null);
-    // renderFinesStateBars('ALL');
-    // renderFinesDetectBars();
-    // renderFinesAgeBars('ALL');
-    // renderFinesMonthlyChart();
-    // if (typeof renderCrossDatasetChart === 'function') renderCrossDatasetChart();
   } catch (err) {
-    console.error("Error loading data:", err);
+    console.error('Error loading data:', err);
   }
 }
+
+// charts measure their container width when drawn, so when the
+// window is resized we redraw them to match the new width.
+// a short debounce stops it firing constantly while dragging.
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const finesPage = document.getElementById('page-fines');
+    if (finesPage && finesPage.classList.contains('active') && finesChartsRendered) {
+      renderAllFinesCharts();
+    }
+  }, 200);
+});
 
 document.addEventListener("DOMContentLoaded", loadData);
