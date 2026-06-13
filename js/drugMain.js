@@ -246,3 +246,7 @@ const DrugPage = (() => {
     };
 
 })();
+
+document.addEventListener('DOMContentLoaded', () => {
+  DrugPage.init();
+});
