@@ -305,22 +305,23 @@
                         </div>
                     </div>
 
-                </div><!-- /.bento -->
+                </div>
 
-                <!-- Cross dataset comparison -->
+                <!-- Arrests by offence type-->
                 <div class="card bento-full">
                     <div class="card-head">
                         <div>
-                            <div class="card-title">Fines vs Arrests by offence — cross-dataset comparison</div>
-                            <div class="card-sub">Combining fines and drug test dataset shows severity of drug driving</div>
+                            <div class="card-title"> Arrests by offence type</div>
+                            <div class="card-sub">Which offences lead to arrests rather than just fines</div>
                         </div>
-                        <div class="legend" id="cross-legend"></div>
+                        <div class="legend" id="arrests-legend"></div>
                     </div>
-                    <div id="cross-chart"></div>
+                    <div id="arrests-chart"></div>
                     <div class="insight-box">
-                        <strong>Key Insight:</strong> Drug driving generates far fewer fines than speeding or
-                        mobile phone usage, however the arrest rate is disproportionately high, showing it is
-                        a serious criminal matter rather than a simple infringement.
+                        <strong>Key Insight:</strong> Unlicensed driving results in far more arrests than any other
+        offence despite generating the fewest fines showing it is treated as a serious criminal
+        matter. In contrast, speeding generates millions of fines but very few arrests, as it is
+        handled as an infringement.
                     </div>
                 </div>
 
@@ -330,12 +331,12 @@
                     Cross-dataset comparison uses data from 2024 only.
                 </div>
 
-            </div><!-- /.content -->
-        </div><!-- /#page-fines -->
+            </div>
+        </div>
 
-    </div><!-- /.main -->
+    </div>
 
-    <!-- INFO PANEL -->
+    
     <div class="info-panel" id="infoPanel">
         <div class="info-top">
             <span class="info-chip" id="infoChip">Info</span>
@@ -349,7 +350,7 @@
         <div class="info-filter-note" id="infoFilterNote" style="display:none">Charts are filtered based on this selection</div>
     </div>
 
-    <!-- JS -->
+    <!-- scripts declaration -->
     
     <script src="https://d3js.org/d3.v7.min.js"></script>
     
@@ -364,7 +365,7 @@
     <script src="js/charts/finesDetect.js"></script>
     <script src="js/charts/finesState.js"></script>
     <script src="js/charts/finesMonthly.js"></script>
-    <script src="js/charts/crossdataset.js"></script>
+    <script src="js/charts/finesArrests.js"></script>
 
 </body>
 </html>
