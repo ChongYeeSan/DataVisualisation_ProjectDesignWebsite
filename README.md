@@ -27,6 +27,14 @@ Lim Yi Yang (106630225)
 
 # 4. File Structure
 
+- **index.html** — Main dashboard page
+- **css/styles.css** — Styling and theme
+- **js/** — JavaScript logic
+  - **finesMain.js** — Fines page + shared functions
+  - **deathMain.js** — Road Deaths page
+  - **charts/** — Individual chart files
+- **data/** — Cleaned CSV datasets
+- **images/** — Screenshots
 
 
 # 5. Data Sources
