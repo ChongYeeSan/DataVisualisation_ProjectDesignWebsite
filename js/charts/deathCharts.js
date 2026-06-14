@@ -37,9 +37,9 @@ function deathTipMove(tooltip, event) {
 
 function deathTipHide(tooltip) { tooltip.style.opacity = '0'; }
 
-// ═══════════════════════════════════════════
+
 // 1. TREND LINE — deaths by year (2014–2025)
-// ═══════════════════════════════════════════
+
 function renderDeathTrend() {
   const container = document.getElementById('death-trend-chart');
   if (!container) return;
@@ -70,7 +70,7 @@ function renderDeathTrend() {
     .range([0, width]).padding(0.2);
 
   const y = d3.scaleLinear()
-    .domain([0, d3.max(data, d => d.count) * 1.15])
+    .domain([0, d3.max(data, d => d.count) * 1.28])
     .range([height, 0]);
 
   svg.append('g').attr('class', 'grid')
@@ -103,17 +103,19 @@ function renderDeathTrend() {
       deathTipHide(tooltip);
     });
 
+    // displays the years from 2014-2025
   svg.append('g').attr('class', 'axis')
     .attr('transform', `translate(0,${height})`)
-    .call(d3.axisBottom(x).tickValues(data.filter((d,i) => i % 2 === 0).map(d => d.year)).tickSize(0))
+    .call(d3.axisBottom(x).tickSize(0))
     .select('.domain').remove();
+
   svg.append('g').attr('class', 'axis')
     .call(d3.axisLeft(y).ticks(4)).select('.domain').remove();
 }
 
-// ═══════════════════════════════════════════
+
 // 2. STATE BARS — deaths by state (2024)
-// ═══════════════════════════════════════════
+
 function renderDeathStateBars(selectedState) {
   const container = document.getElementById('death-state-bars');
   if (!container) return;
@@ -146,9 +148,9 @@ function renderDeathStateBars(selectedState) {
   });
 }
 
-// ═══════════════════════════════════════════
-// 3. ROAD USER — progress bars (2024)
-// ═══════════════════════════════════════════
+
+//  ROAD USER — progress bars (2024)
+
 function renderDeathUserBars() {
   const container = document.getElementById('death-user-bars');
   if (!container) return;
@@ -179,9 +181,9 @@ function renderDeathUserBars() {
   });
 }
 
-// ═══════════════════════════════════════════
-// 4. AGE GROUP BARS (2024)
-// ═══════════════════════════════════════════
+
+// AGE GROUP BARS (2024)
+
 function renderDeathAgeBars() {
   const container = document.getElementById('death-age-chart');
   if (!container) return;
