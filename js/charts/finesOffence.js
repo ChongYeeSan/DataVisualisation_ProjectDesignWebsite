@@ -165,7 +165,7 @@ function renderFinesOffenceChart(dimOffence) {
     .attr('fill', 'var(--pink-bar)')
     .style('display', d => d.camera > 0 ? 'block' : 'none')
     .on('mousemove', function(event, d) {
-      showTooltip(event, d.label, 'Camera', d.camera, getCameraInfo(d.metric));
+      showTooltip(event, d.label, 'Camera', d.camera, getCameraInfo(d.metric)); // upon hovering on bar chart data will show
     })
     .on('mouseleave', hideTooltip);
 

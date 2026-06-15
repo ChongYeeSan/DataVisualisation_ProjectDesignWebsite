@@ -203,7 +203,7 @@ function renderDeathAgeBars() {
   let data = getDeathSnapshot();
 
   const bins = [
-    { label: '0-16',  min: 0,  max: 16 },
+    { label: '1-16',  min: 0,  max: 16 },
     { label: '17-25', min: 17, max: 25 },
     { label: '26-39', min: 26, max: 39 },
     { label: '40-64', min: 40, max: 64 },
@@ -281,7 +281,7 @@ function renderDeathSpeedBars() {
     .attr('x', d => x(d.label)).attr('y', d => y(d.val))
     .attr('width', x.bandwidth()).attr('height', d => height - y(d.val))
     .attr('rx', 3).attr('fill', 'var(--orange)')
-    .on('mousemove', (event, d) => deathTipShow(tooltip, event, `${d.label} km/h zone`, `${d.val} deaths`, 'Road fatalities 2024'))
+    .on('mousemove', (event, d) => deathTipShow(tooltip, event, `${d.label} km/h zone`, `${d.val} deaths`, 'Road fatalities 2024')) // hovering on the chart 
     .on('mouseleave', () => deathTipHide(tooltip));
 
   svg.append('g').attr('class', 'axis')
