@@ -220,11 +220,12 @@ function renderDeathAgeBars() {
   svg.append('g').attr('class', 'grid')
     .call(d3.axisLeft(y).tickSize(-width).tickFormat('').ticks(3));
 
+    // age-group bar chart colour
   svg.selectAll('.age-bar').data(ageData).enter().append('rect')
     .attr('class', 'bar-rect')
     .attr('x', d => x(d.label)).attr('y', d => y(d.val))
     .attr('width', x.bandwidth()).attr('height', d => height - y(d.val))
-    .attr('rx', 3).attr('fill', 'var(--orange)')
+    .attr('rx', 3).attr('fill', 'var(--maroon)')
     .on('mousemove', (event, d) => deathTipShow(tooltip, event, `Age ${d.label}`, `${d.val} deaths`, 'Road fatalities 2024'))
     .on('mouseleave', () => deathTipHide(tooltip));
 
@@ -274,6 +275,7 @@ function renderDeathSpeedBars() {
   svg.append('g').attr('class', 'grid')
     .call(d3.axisLeft(y).tickSize(-width).tickFormat('').ticks(3));
 
+    // orange given to speed bar chart
   svg.selectAll('.speed-bar').data(speedData).enter().append('rect')
     .attr('class', 'bar-rect')
     .attr('x', d => x(d.label)).attr('y', d => y(d.val))

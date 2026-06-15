@@ -2,6 +2,8 @@
    deathMain.js
    Road Deaths page — data loading, filters,
    KPIs and chart triggers
+   for Deaths by age group & speed zone only took 2024 
+   because we wanted to match the fines page 
 ═══════════════════════════════════════════ */
 
 // holds the road deaths data once loaded
