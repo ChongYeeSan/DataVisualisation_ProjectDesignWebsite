@@ -24,20 +24,20 @@ function showPage(name, el) {
   el.classList.add("active");
   closeInfo();
 
-  // render fines charts on first open
+ 
   if (name === 'fines' && !finesChartsRendered) {
     renderAllFinesCharts();
     finesChartsRendered = true;
   }
 
-  // render death charts on first open
+
   if (name === 'death' && !deathChartsRendered) {
     renderAllDeathCharts();
     deathChartsRendered = true;
   }
 }
 
-// helper that draws every fines chart — used on first open and on resize
+// helper that draws every fines chart
 function renderAllFinesCharts() {
   renderFinesOffenceChart(null);
   renderFinesStateBars(filters.fines.state);
@@ -133,7 +133,6 @@ function undimAll(containerId) {
     .forEach((b) => b.classList.remove("dimmed"));
 }
 
-// ── FINES FILTERS ─────────────────────────────────────
 
 function applyFinesStateFilter(state) {
   // toggle — clicking the same state again resets
@@ -147,7 +146,7 @@ function applyFinesStateFilter(state) {
 
   updateFinesKPIs();
 
-  // redraw all fines charts with the new filter applied
+
   renderFinesOffenceChart(null);
   renderFinesStateBars(state);
   renderFinesDetectBars();
@@ -231,7 +230,7 @@ async function loadData() {
     const finesNums = ['FINES', 'ARRESTS', 'CHARGES'];
     finesData2024.forEach(d => finesNums.forEach(c => d[c] = +d[c] || 0));
 
-    // update KPIs on load (charts render when the fines page is opened)
+
     updateFinesKPIs();
 
   } catch (err) {
@@ -239,9 +238,8 @@ async function loadData() {
   }
 }
 
-// charts measure their container width when drawn, so when the
-// window is resized we redraw them to match the new width.
-// a short debounce stops it firing constantly while dragging.
+// charts measure their container width when drawn
+
 let resizeTimer;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);

@@ -3,22 +3,18 @@
    Road Deaths page — data loading, filters,
    KPIs and chart triggers
    for Deaths by age group & speed zone only took 2024 
-   because we wanted to match the fines page 
+   because wanted to match the fines page 
 ═══════════════════════════════════════════ */
 
-// holds the road deaths data once loaded
 let deathData = [];
 
-// current filter state for the deaths page
 let deathFilters = {
   state: 'ALL',
   user:  'ALL',
 };
 
-// tracks whether the charts have been drawn yet
 let deathChartsRendered = false;
 
-// the headline year used for all snapshot charts (matches fines page)
 const DEATH_YEAR = 2024;
 
 // ── DATA LOADING ──────────────────────────────────────
@@ -42,23 +38,23 @@ async function loadDeathData() {
   }
 }
 
-// ── HELPER — returns data for the snapshot year, filtered ──
+//  returns data for the snapshot year, filtered
 function getDeathSnapshot() {
-  // start with the headline year only
+
   let data = deathData.filter(d => d.Year === DEATH_YEAR);
 
   // apply state filter
   if (deathFilters.state !== 'ALL') {
     data = data.filter(d => d.State === deathFilters.state);
   }
-  // apply road user filter
+
   if (deathFilters.user !== 'ALL') {
     data = data.filter(d => d.Road_User === deathFilters.user);
   }
   return data;
 }
 
-// ── KPI UPDATER ───────────────────────────────────────
+
 function updateDeathKPIs() {
   const data = getDeathSnapshot();
 
@@ -73,7 +69,7 @@ function updateDeathKPIs() {
   document.getElementById('dt-ped').textContent     = peds.toLocaleString();
 }
 
-// ── DRAW ALL CHARTS ───────────────────────────────────
+
 function renderAllDeathCharts() {
   renderDeathTrend();
   renderDeathStateBars(deathFilters.state);
@@ -82,7 +78,6 @@ function renderAllDeathCharts() {
   renderDeathSpeedBars();
 }
 
-// ── FILTERS ───────────────────────────────────────────
 
 function applyDeathStateFilter(state) {
   // toggle — click the same state again to reset
@@ -125,7 +120,7 @@ function resetDeathFilter() {
   updateDeathFilterBar();
 }
 
-// ── FILTER BAR ────────────────────────────────────────
+
 function updateDeathFilterBar() {
   const bar = document.getElementById('death-filter-bar');
   const tag = document.getElementById('death-filter-tag');
@@ -143,7 +138,6 @@ function updateDeathFilterBar() {
   }
 }
 
-// ── RESIZE HANDLER ────────────────────────────────────
 let deathResizeTimer;
 window.addEventListener('resize', () => {
   clearTimeout(deathResizeTimer);
@@ -155,5 +149,5 @@ window.addEventListener('resize', () => {
   }, 200);
 });
 
-// ── INIT ──────────────────────────────────────────────
+// fetch death page once it calls the HTML page
 document.addEventListener('DOMContentLoaded', loadDeathData);

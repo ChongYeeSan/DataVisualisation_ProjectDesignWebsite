@@ -135,7 +135,7 @@ function renderDeathStateBars(selectedState) {
     row.className = `state-row${isSel ? ' selected' : ''}`;
     row.innerHTML = `
       <span class="state-name">${d.code}</span>
-      <div class="state-bar-track"><div class="state-bar" style="width:${pct}%;background:${isSel ? 'var(--gold)' : 'var(--orange)'}"></div></div>
+      <div class="state-bar-track"><div class="state-bar" style="width:${pct}%;background:${isSel ? 'var(--gold)' : 'var(--orange)'}"></div></div> 
       <span class="state-val">${d.val}</span>
     `;
     row.addEventListener('mousemove', e => deathTipShow(tooltip, e, d.code, `${d.val} deaths`, 'Road fatalities 2024'));
