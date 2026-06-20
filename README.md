@@ -5,7 +5,7 @@ Road Safety Enforcement Dashboard
 
 # Brief Description of what it does and what datasets it uses:
 
-The creation of this dashboard is to show users which age group is positive for the type of drugs taking under each jurisdiction. As well as, showing which type of offense is done by which age group. 
+This dashboard visualises road safety enforcement data across Australia. It shows which age groups test positive for different drug types under each jurisdiction, the types of offences and how fines are detected (such as by camera or police-issued tickets), and road death trends from 2014 to 2025 including the age groups and speed zones involved. The aim is to make road safety enforcement data easier to understand for the general public.
 
 The dataset used in showing the visuals are from the BITRE and National Road Safety Data Hub of Australia.
 
@@ -30,7 +30,8 @@ Lim Yi Yang (106630225)
 - **index.html** — Main dashboard page
 - **css/styles.css** — Styling and theme
 - **js/** — JavaScript logic
-  - **finesMain.js** — Fines page + shared functions
+  - **finesMain.js** — Drug Page
+  - **finesMain.js** — Fines page 
   - **deathMain.js** — Road Deaths page
   - **charts/** — Individual chart files
 - **data/** — Cleaned CSV datasets

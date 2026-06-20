@@ -67,6 +67,14 @@ function updateDeathKPIs() {
   document.getElementById('dt-drivers').textContent = drivers.toLocaleString();
   document.getElementById('dt-moto').textContent    = moto.toLocaleString();
   document.getElementById('dt-ped').textContent     = peds.toLocaleString();
+
+  // work out each road user type as a percentage of total deaths
+  // and show it in the small badge on each KPI card
+  const pct = (part) => total > 0 ? Math.round((part / total) * 100) + '%' : '0%';
+
+  document.getElementById('dt-drivers-badge').textContent = pct(drivers);
+  document.getElementById('dt-moto-badge').textContent    = pct(moto);
+  document.getElementById('dt-ped-badge').textContent     = pct(peds);
 }
 
 
