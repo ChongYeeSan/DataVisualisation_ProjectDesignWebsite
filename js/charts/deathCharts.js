@@ -164,8 +164,8 @@ function renderDeathUserBars() {
   let userData = Array.from(byUser, ([label, val]) => ({ label, val }))
     .sort((a, b) => b.val - a.val);
 
-  userData = userData.filter(d => d.label !== 'Unknown').slice(0, 5);
   const total = d3.sum(userData, d => d.val);
+  userData = userData.filter(d => d.label !== 'Unknown').slice(0, 5);
 
   userData.forEach(d => {
     const pct = Math.round((d.val / total) * 100);
