@@ -126,6 +126,7 @@ function renderDeathStateBars(selectedState) {
   const byState = d3.rollup(data, v => v.length, d => d.State);
   const stateData = Array.from(byState, ([code, val]) => ({ code, val }))
     .sort((a, b) => b.val - a.val);
+  if (stateData.length === 0) return;
   const max = stateData[0].val;
 
   stateData.forEach(d => {
@@ -164,8 +165,8 @@ function renderDeathUserBars() {
   let userData = Array.from(byUser, ([label, val]) => ({ label, val }))
     .sort((a, b) => b.val - a.val);
 
-  userData = userData.filter(d => d.label !== 'Unknown').slice(0, 5);
   const total = d3.sum(userData, d => d.val);
+  userData = userData.filter(d => d.label !== 'Unknown').slice(0, 5);
 
   userData.forEach(d => {
     const pct = Math.round((d.val / total) * 100);
