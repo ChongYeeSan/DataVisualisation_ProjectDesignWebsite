@@ -66,7 +66,7 @@
             .padding(0.3);
 
         xScale = d3.scaleLinear()
-            .domain([0, d3.max(drugTypeData, d => d.count) * 1.1])
+            .domain([0, (d3.max(drugTypeData, d => d.count) || 0) * 1.1 || 1])
             .range([0, innerW]);
 
         // Y axis (drug names)
@@ -95,7 +95,7 @@
 
         const { drugTypeData } = data;
 
-        xScale.domain([0, d3.max(drugTypeData, d => d.count) * 1.1]);
+        xScale.domain([0, (d3.max(drugTypeData, d => d.count) || 0) * 1.1 || 1]);
 
         const bars = svg.select('.drug-type-bars')
             .selectAll('.dtype-bar')

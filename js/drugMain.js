@@ -1,253 +1,319 @@
 /**
  * drugMain.js
  * ─────────────────────────────────────────────────────────────
- * Central data store + filter logic for the Drug Test page.
- * All chart files (drugTrend, drugState, drugAge, drugType)
- * read from DrugPage.filtered() and call DrugPage.onFilter()
- * to push filter changes.  Nothing here touches the Fines page.
+ * Central data layer for the drug-test dashboard.
+ *
+ * Loads drug_tests_full.csv with d3.csv(), shapes it into the
+ * slices each chart needs, and exposes a small pub/sub API
+ * (DrugPage) that drugTrend.js / drugType.js / drugAge.js /
+ * drugState.js all register against via DrugPage.onFilter().
+ *
+ * CSV schema (one row per detection-method record):
+ *   YEAR, JURISDICTION, LOCATION, AGE_GROUP, METRIC,
+ *   DETECTION_METHOD, FINES, ARRESTS, CHARGES,
+ *   BEST_DETECTION_METHOD, AMPHETAMINE, CANNABIS, COCAINE,
+ *   ECSTASY, METHYLAMPHETAMINE, NO_DRUGS_DETECTED, COUNT
+ *
+ *
  * ─────────────────────────────────────────────────────────────
  */
 
-const DrugPage = (() => {
+const DrugPage = (function () {
+  const CSV_PATH = "/data/drug_tests_full.csv";
 
-    // ── RAW DATA ────────────────────────────────────────────────
-    // Pre-aggregated from drug_tests_full.csv so no CSV fetch needed.
+  const DETECT_LABEL_MAP = {
+    "Indicator (Stage 1)": "Stage 1 – Indicator",
+    "Secondary Confirmatory (Stage 2)": "Stage 2 – Confirmatory",
+    "Laboratory or Toxicology (Stage 3)": "Stage 3 – Lab / Toxicology",
+  };
 
-    /** Positive test totals by year (all states combined) */
-    const TREND_DATA = [
-        { year: 2008, count: 2413  },
-        { year: 2009, count: 2910  },
-        { year: 2010, count: 4033  },
-        { year: 2011, count: 5604  },
-        { year: 2012, count: 8242  },
-        { year: 2013, count: 9853  },
-        { year: 2014, count: 16289 },
-        { year: 2015, count: 35143 },
-        { year: 2016, count: 38703 },
-        { year: 2017, count: 39855 },
-        { year: 2018, count: 48216 },
-        { year: 2019, count: 48466 },
-        { year: 2020, count: 46905 },
-        { year: 2021, count: 49465 },
-        { year: 2022, count: 46868 },
-        { year: 2023, count: 49500 },
-        { year: 2024, count: 42964 },
+  const DRUG_FIELD_MAP = {
+    AMPHETAMINE: "Amphetamine",
+    CANNABIS: "Cannabis",
+    COCAINE: "Cocaine",
+    ECSTASY: "Ecstasy",
+    METHYLAMPHETAMINE: "Methylamph.",
+  };
+
+  let rawRows = [];
+  let listeners = [];
+  let filters = { year: "ALL", state: "ALL" };
+  let ready = false;
+  let loadPromise = null;
+
+  // ── LOAD ────────────────────────────────────────────────────
+  function load() {
+    if (loadPromise) return loadPromise;
+
+    loadPromise = d3.csv(CSV_PATH, d3.autoType).then((rows) => {
+      // d3.autoType will coerce YEAR to a number and leave the
+      // "Yes"/"No"/"Not applicable" strings as-is, which is what
+      // we want for the boolean-ish flag columns.
+      rawRows = rows;
+      ready = true;
+      return rawRows;
+    });
+
+    return loadPromise;
+  }
+
+  // ── AGGREGATION HELPERS ─────────────────────────────────────
+
+  function applyScopeFilters(rows) {
+    return rows.filter((r) => {
+      if (filters.year !== "ALL" && String(r.YEAR) !== String(filters.year))
+        return false;
+      if (filters.state !== "ALL" && r.JURISDICTION !== filters.state)
+        return false;
+      return true;
+    });
+  }
+
+  /** Trend: positive tests per year. BEST_DETECTION_METHOD = "Yes" is the
+   *  de-dup key across both the 2008–2022 rollup rows and the 2023–2024
+   *  granular rows, so no AGE_GROUP/LOCATION constraint is applied here —
+   *  adding one would silently drop 2023–2024, which never has
+   *  "All ages / All regions" rows. */
+  function buildTrendData(rows) {
+    const scoped = rows.filter(
+      (r) =>
+        r.BEST_DETECTION_METHOD === "Yes" &&
+        (filters.state === "ALL" || r.JURISDICTION === filters.state),
+    );
+
+    const byYear = d3.rollup(
+      scoped,
+      (v) => d3.sum(v, (d) => d.COUNT),
+      (d) => d.YEAR,
+    );
+
+    return Array.from(byYear, ([year, count]) => ({ year: +year, count }))
+      .sort((a, b) => a.year - b.year)
+      .map((d) => ({
+        ...d,
+        dimmed:
+          filters.year !== "ALL" && String(d.year) !== String(filters.year),
+      }));
+  }
+
+  /** Type: total positive tests per substance, honoring year/state filters. */
+  function buildDrugTypeData(rows) {
+    const scoped = applyScopeFilters(rows);
+    const counts = {};
+    Object.values(DRUG_FIELD_MAP).forEach((label) => {
+      counts[label] = 0;
+    });
+
+    scoped.forEach((r) => {
+      Object.entries(DRUG_FIELD_MAP).forEach(([field, label]) => {
+        if (r[field] === "Yes") counts[label] += r.COUNT;
+      });
+    });
+
+    return Object.entries(counts)
+      .map(([drug, count]) => ({ drug, count }))
+      .filter((d) => d.count > 0)
+      .sort((a, b) => b.count - a.count);
+  }
+
+  /** Age: total positive tests per age group, honoring year/state filters.
+   *  Excludes AGE_GROUP = "All ages" so the 2008–2022 national rollup rows
+   *  (which use that placeholder) aren't counted as a fake age bucket. */
+  function buildAgeData(rows) {
+    const scoped = applyScopeFilters(rows).filter(
+      (r) => r.AGE_GROUP !== "All ages" && r.BEST_DETECTION_METHOD === "Yes",
+    );
+
+    const byAge = d3.rollup(
+      scoped,
+      (v) => d3.sum(v, (d) => d.COUNT),
+      (d) => d.AGE_GROUP,
+    );
+
+    const order = ["0-16", "17-25", "26-39", "40-64", "65 and over"];
+    return order
+      .filter((age) => byAge.has(age))
+      .map((age) => ({ age, count: byAge.get(age) }));
+  }
+
+  /** State: total positive tests per jurisdiction, honoring the year filter
+   *  only (state itself is the dimension being shown, so it ignores the
+   *  state filter). Same BEST_DETECTION_METHOD de-dup rule as Trend, with
+   *  no AGE_GROUP/LOCATION constraint so 2023–2024 isn't dropped. */
+  function buildStateData(rows) {
+    const scoped = rows.filter(
+      (r) =>
+        r.BEST_DETECTION_METHOD === "Yes" &&
+        (filters.year === "ALL" || String(r.YEAR) === String(filters.year)),
+    );
+
+    const byState = d3.rollup(
+      scoped,
+      (v) => d3.sum(v, (d) => d.COUNT),
+      (d) => d.JURISDICTION,
+    );
+
+    return Array.from(byState, ([state, count]) => ({ state, count })).sort(
+      (a, b) => b.count - a.count,
+    );
+  }
+
+  /** Detection stage breakdown: Indicator / Secondary Confirmatory / Lab-Toxicology,
+   *  summed across all rows (this is the only slice where the three stages are
+   *  meant to be compared directly), honoring year/state filters. */
+  function buildDetectData(rows) {
+    const scoped = applyScopeFilters(rows);
+
+    const byMethod = d3.rollup(
+      scoped,
+      (v) => d3.sum(v, (d) => d.COUNT),
+      (d) => d.DETECTION_METHOD,
+    );
+
+    const order = [
+      "Indicator (Stage 1)",
+      "Secondary Confirmatory (Stage 2)",
+      "Laboratory or Toxicology (Stage 3)",
     ];
 
-    /** Positive tests by state, across all years */
-    const STATE_DATA = [
-        { state: 'NSW', count: 168407 },
-        { state: 'VIC', count: 103900 },
-        { state: 'QLD', count:  94154 },
-        { state: 'SA',  count:  57026 },
-        { state: 'WA',  count:  40113 },
-        { state: 'TAS', count:  23786 },
-        { state: 'ACT', count:   5595 },
-        { state: 'NT',  count:   2448 },
-    ];
+    return order
+      .filter((m) => byMethod.has(m))
+      .map((m) => ({
+        method: DETECT_LABEL_MAP[m] || m,
+        count: byMethod.get(m),
+      }));
+  }
 
-    /** Positive tests by age group, all years */
-    const AGE_DATA = [
-        { age: '0–16',        count:    120 },
-        { age: '17–25',       count:  17648 },
-        { age: '26–39',       count:  39243 },
-        { age: '40–64',       count:  34674 },
-        { age: '65+',         count:    779 },
-    ];
-
-    /** Drug type flags — one test can flag multiple drugs */
-    const DRUG_TYPE_DATA = [
-        { drug: 'Amphetamine',     count: 24800 + 28855 }, // 2024 + 2023 sample — use full dataset total
-        { drug: 'Cannabis',        count: 20852 + 24402 },
-        { drug: 'Ecstasy',         count:  1095 +   751 },
-        { drug: 'Cocaine',         count:  5862 +  3505 },
-        { drug: 'Methylamph.',     count:     0 },          // flagged but zero in available slice
-    ];
-
-    // Full-dataset drug totals (all years, from CSV analysis)
-    const DRUG_TYPE_FULL = [
-        { drug: 'Amphetamine',  count: 53655  },
-        { drug: 'Cannabis',     count: 45254  },
-        { drug: 'Cocaine',      count:  9367  },
-        { drug: 'Ecstasy',      count:  1846  },
-        { drug: 'Methylamph.',  count:    242 },
-    ];
-
-    /** Detection stage totals */
-    const DETECT_DATA = [
-        { method: 'Stage 1 – Indicator',          count: 449328 },
-        { method: 'Stage 2 – Confirmatory',        count:  13495 },
-        { method: 'Stage 3 – Lab / Toxicology',    count:  32606 },
-    ];
-
-    /** KPI totals — 2024 only (most recent full cut) */
-    const KPI_2024 = { tests: 42964, fines: 14144, arrests: 36, charges: 23445 };
-    /** KPI totals — all years */
-    const KPI_ALL  = { tests: 495429, fines: 0, arrests: 0, charges: 0 }; // fines/arrests not summed across full history
-
-    // ── FILTER STATE ────────────────────────────────────────────
-    let _state  = 'ALL';
-    let _year   = 'ALL';
-
-    // Registered chart redraw callbacks
-    const _listeners = [];
-
-    // ── PUBLIC API ──────────────────────────────────────────────
-    function applyStateFilter(val) {
-        _state = val;
-        _syncDropdown('drug-state-filter', val);
-        _updateFilterBar();
-        _notifyAll();
-        _renderKPIs();
-    }
-
-    function applyYearFilter(val) {
-        _year = val;
-        _syncDropdown('drug-year-filter', val);
-        _updateFilterBar();
-        _notifyAll();
-        _renderKPIs();
-    }
-
-    function resetFilters() {
-        _state = 'ALL';
-        _year  = 'ALL';
-        _syncDropdown('drug-state-filter', 'ALL');
-        _syncDropdown('drug-year-filter',  'ALL');
-        _updateFilterBar();
-        _notifyAll();
-        _renderKPIs();
-    }
-
-    /** Charts call this to register their redraw function */
-    function onFilter(fn) {
-        _listeners.push(fn);
-    }
-
-    /**
-     * Returns the current filter state so charts can react.
-     * { state, year, trendData, stateData, ageData, drugTypeData, detectData }
-     */
-    function filtered() {
-        // Trend: if a state is chosen, scale the national trend by that
-        // state's share.  If a year is chosen, highlight that year.
-        let trendData = TREND_DATA;
-        if (_state !== 'ALL') {
-            const stateRow   = STATE_DATA.find(d => d.state === _state);
-            const totalState = stateRow ? stateRow.count : 0;
-            const totalAll   = STATE_DATA.reduce((a, b) => a + b.count, 0);
-            const ratio      = totalAll ? totalState / totalAll : 0;
-            trendData = TREND_DATA.map(d => ({ ...d, count: Math.round(d.count * ratio) }));
-        }
-        if (_year !== 'ALL') {
-            trendData = trendData.map(d => ({ ...d, dimmed: d.year !== +_year }));
-        }
-
-        // State bars: highlight active state
-        const stateData = STATE_DATA.map(d => ({
-            ...d,
-            selected: _state !== 'ALL' && d.state === _state,
-        }));
-
-        // Age: if year filter, scale proportionally (approximation)
-        let ageData = AGE_DATA;
-        if (_year !== 'ALL') {
-            const yearRow   = TREND_DATA.find(d => d.year === +_year);
-            const yearCount = yearRow ? yearRow.count : 0;
-            const totalAll  = TREND_DATA.reduce((a, b) => a + b.count, 0);
-            const ratio     = totalAll ? yearCount / totalAll : 0;
-            ageData = AGE_DATA.map(d => ({ ...d, count: Math.round(d.count * ratio) }));
-        }
-
-        return {
-            state:        _state,
-            year:         _year,
-            trendData,
-            stateData,
-            ageData,
-            drugTypeData: DRUG_TYPE_FULL,
-            detectData:   DETECT_DATA,
-        };
-    }
-
-    // ── PRIVATE HELPERS ─────────────────────────────────────────
-    function _notifyAll() {
-        _listeners.forEach(fn => fn(filtered()));
-    }
-
-    function _syncDropdown(id, val) {
-        const el = document.getElementById(id);
-        if (el) el.value = val;
-    }
-
-    function _updateFilterBar() {
-        const bar = document.getElementById('drug-filter-bar');
-        const tag = document.getElementById('drug-filter-tag');
-        if (!bar || !tag) return;
-        const parts = [];
-        if (_state !== 'ALL') parts.push(_state);
-        if (_year  !== 'ALL') parts.push(_year);
-        if (parts.length) {
-            tag.innerHTML = parts.join(' · ') + ' <button onclick="DrugPage.resetFilters()">✕</button>';
-            bar.classList.add('visible');
-        } else {
-            bar.classList.remove('visible');
-        }
-    }
-
-    function _renderKPIs() {
-        // For now use 2024 values; when filtered by year swap to year-specific
-        const kpi = (_year === '2024' || _year === 'ALL') ? KPI_2024 : _kpiForYear(+_year);
-        _setKPI('d-kpi-tests',   kpi.tests);
-        _setKPI('d-kpi-fines',   kpi.fines);
-        _setKPI('d-kpi-arrests', kpi.arrests);
-        _setKPI('d-kpi-charges', kpi.charges);
-    }
-
-    function _kpiForYear(yr) {
-        // Per-year KPI lookup table
-        const perYear = {
-            2023: { tests: 49500, fines: 12990, arrests: 42,  charges: 27698 },
-            2022: { tests: 46868, fines: 0,     arrests: 0,   charges: 0     },
-            2021: { tests: 49465, fines: 0,     arrests: 0,   charges: 0     },
-            2020: { tests: 46905, fines: 0,     arrests: 0,   charges: 0     },
-            2019: { tests: 48466, fines: 0,     arrests: 0,   charges: 0     },
-            2018: { tests: 48216, fines: 0,     arrests: 0,   charges: 0     },
-            2017: { tests: 39855, fines: 0,     arrests: 0,   charges: 0     },
-            2016: { tests: 38703, fines: 0,     arrests: 0,   charges: 0     },
-            2015: { tests: 35143, fines: 0,     arrests: 0,   charges: 0     },
-        };
-        return perYear[yr] || { tests: 0, fines: 0, arrests: 0, charges: 0 };
-    }
-
-    function _setKPI(id, val) {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.textContent = val > 0 ? val.toLocaleString() : '—';
-    }
-
-    // ── INIT ────────────────────────────────────────────────────
-    function init() {
-        // Called by drugTrend/drugState/drugAge/drugType after they register
-        // their listeners.  We defer one tick so all script tags have run.
-        setTimeout(() => {
-            _renderKPIs();
-            _notifyAll();
-        }, 0);
-    }
+  /** KPI totals: positive tests, fines, arrests, charges, honoring both
+   *  year and state filters. Same BEST_DETECTION_METHOD de-dup rule as
+   *  Trend/State, with no AGE_GROUP/LOCATION constraint. */
+  function buildKpiData(rows) {
+    const scoped = rows.filter(
+      (r) =>
+        r.BEST_DETECTION_METHOD === "Yes" &&
+        (filters.year === "ALL" || String(r.YEAR) === String(filters.year)) &&
+        (filters.state === "ALL" || r.JURISDICTION === filters.state),
+    );
 
     return {
-        applyStateFilter,
-        applyYearFilter,
-        resetFilters,
-        onFilter,
-        filtered,
-        init,
+      tests: d3.sum(scoped, (d) => d.COUNT),
+      fines: d3.sum(scoped, (d) => d.FINES),
+      arrests: d3.sum(scoped, (d) => d.ARRESTS),
+      charges: d3.sum(scoped, (d) => d.CHARGES),
     };
+  }
 
+  // ── BUILD + BROADCAST ───────────────────────────────────────
+  function buildPayload() {
+    return {
+      trendData: buildTrendData(rawRows),
+      drugTypeData: buildDrugTypeData(rawRows),
+      ageData: buildAgeData(rawRows),
+      stateData: buildStateData(rawRows),
+      detectData: buildDetectData(rawRows),
+      kpiData: buildKpiData(rawRows),
+      year: filters.year,
+      state: filters.state,
+    };
+  }
+
+  function notify() {
+    if (!ready) return;
+    const payload = buildPayload();
+    renderChrome(payload);
+    listeners.forEach((fn) => fn(payload));
+  }
+
+  // ── UI CHROME (KPI cards, filter tag, dropdown sync) ─────────
+  // These touch DOM elements that live in index.html but aren't owned by
+  // any individual chart file, so drugMain.js updates them directly.
+
+  function _fmt(n) {
+    if (n == null) return "—";
+    return n.toLocaleString();
+  }
+
+  function renderKpis(kpiData) {
+    const map = {
+      "d-kpi-tests": kpiData.tests,
+      "d-kpi-fines": kpiData.fines,
+      "d-kpi-arrests": kpiData.arrests,
+      "d-kpi-charges": kpiData.charges,
+    };
+    Object.entries(map).forEach(([id, value]) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = _fmt(value);
+    });
+  }
+
+  function renderFilterBar(payload) {
+    const tagEl = document.getElementById("drug-filter-tag");
+    const barEl = document.getElementById("drug-filter-bar");
+    if (!tagEl) return;
+
+    const parts = [];
+    if (payload.year !== "ALL") parts.push(String(payload.year));
+    if (payload.state !== "ALL") parts.push(payload.state);
+
+    const label = parts.length ? parts.join(", ") : "—";
+    // Preserve the close (✕) button; only swap the leading text node.
+    const closeBtn = tagEl.querySelector("button");
+    tagEl.textContent = label + " ";
+    if (closeBtn) tagEl.appendChild(closeBtn);
+
+    if (barEl) barEl.classList.toggle("active", parts.length > 0);
+  }
+
+  function syncDropdowns(payload) {
+    const stateSel = document.getElementById("drug-state-filter");
+    const yearSel = document.getElementById("drug-year-filter");
+    if (stateSel && stateSel.value !== payload.state)
+      stateSel.value = payload.state;
+    if (yearSel && yearSel.value !== String(payload.year))
+      yearSel.value = String(payload.year);
+  }
+
+  function renderChrome(payload) {
+    renderKpis(payload.kpiData);
+    renderFilterBar(payload);
+    syncDropdowns(payload);
+  }
+
+  // ── PUBLIC API ───────────────────────────────────────────────
+  function onFilter(fn) {
+    listeners.push(fn);
+    if (ready) fn(buildPayload());
+  }
+
+  function applyYearFilter(year) {
+    filters.year = year;
+    notify();
+  }
+
+  function applyStateFilter(state) {
+    filters.state = state;
+    notify();
+  }
+
+  function resetFilters() {
+    filters = { year: "ALL", state: "ALL" };
+    notify();
+  }
+
+  function filtered() {
+    return { ...filters };
+  }
+
+  function init() {
+    load().then(() => notify());
+  }
+
+  return {
+    init,
+    onFilter,
+    applyYearFilter,
+    applyStateFilter,
+    resetFilters,
+    filtered,
+  };
 })();
-
-// 
-document.addEventListener('DOMContentLoaded', () => {
-  DrugPage.init();
-});

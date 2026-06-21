@@ -1,0 +1,54 @@
+{
+    "version": "5.4.3.v202503031608",
+    "created": "2026-06-21 16:44",
+    "nodestats": {
+        "nodes": [
+            {
+                "id": "org.knime.base.views.node.barchart.BarChartNodeFactory",
+                "nodename": "Bar Chart",
+                "nrexecs": 15,
+                "nrfails": 0,
+                "exectime": 739,
+                "nrcreated": 3,
+                "nrsettingsChanged": 12,
+                "successor": "n/a",
+                "successornodename": "n/a"
+            },
+            {
+                "id": "org.knime.base.node.preproc.filter.column.DataColumnSpecFilterNodeFactory",
+                "nodename": "Column Filter",
+                "nrexecs": 0,
+                "nrfails": 0,
+                "exectime": 0,
+                "nrcreated": 0,
+                "nrsettingsChanged": 0,
+                "successor": "org.knime.base.views.node.barchart.BarChartNodeFactory",
+                "successornodename": "Bar Chart"
+            }
+        ],
+        "metaNodes": {
+        },
+        "wrappedNodes": {
+        },
+        "createdVia": {
+            "WEB_UI": 3,
+            "WEB_UI_QUICK_INSERTION_RECOMMENDED": 3
+        }
+    },
+    "uptime": 207419,
+    "workflowsOpened": 2,
+    "remoteWorkflowsOpened": 0,
+    "workflowsCreated": 0,
+    "remoteWorkflowsCreated": 0,
+    "columnarStorageWorkflowsOpened": 0,
+    "workflowsImported": 0,
+    "workflowsExported": 0,
+    "webUIPerspectiveSwitches": 0,
+    "javaUIPerspectiveSwitches": 0,
+    "lastUsedPerspective": "none",
+    "launches": 2,
+    "lastApplicationID": "org.knime.product.KNIME_APPLICATION",
+    "timeSinceLastStart": 85126,
+    "crashes": 0,
+    "properlyShutDown": true
+}

@@ -48,7 +48,7 @@
 
     yScale = d3
       .scaleLinear()
-      .domain([0, d3.max(ageData, (d) => d.count) * 1.15])
+      .domain([0, (d3.max(ageData, (d) => d.count) || 0) * 1.15 || 1])
       .range([innerH, 0]);
 
     // Horizontal grid
@@ -98,7 +98,7 @@
     const { ageData } = data;
 
     // Update y scale domain if data changed (e.g. year filter)
-    yScale.domain([0, d3.max(ageData, (d) => d.count) * 1.15]);
+    yScale.domain([0, (d3.max(ageData, (d) => d.count) || 0) * 1.15 || 1]);
     svg
       .select(".y-axis")
       .transition()
