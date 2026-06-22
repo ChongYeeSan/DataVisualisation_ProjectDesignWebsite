@@ -19,7 +19,7 @@
  */
 
 const DrugPage = (function () {
-  const CSV_PATH = "/data/drug_tests_full.csv";
+  const CSV_PATH = 'data/drug_tests_full.csv';
 
   const DETECT_LABEL_MAP = {
     "Indicator (Stage 1)": "Stage 1 – Indicator",

@@ -37,7 +37,7 @@ function showPage(name, el) {
   }
 }
 
-// helper that draws every fines chart
+// draws every fines chart
 function renderAllFinesCharts() {
   renderFinesOffenceChart(null);
   renderFinesStateBars(filters.fines.state);
